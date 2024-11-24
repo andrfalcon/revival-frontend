@@ -1,7 +1,9 @@
+import S3BucketViewer from "./components/S3BucketViewer";
+
 function App() {
   return (
     <div>
-      <h1>Hello, World</h1>
+      <S3BucketViewer />
     </div>
   );
 }
