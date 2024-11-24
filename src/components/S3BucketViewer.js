@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
 
 const S3BucketViewer = () => {
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [selectedVideos, setSelectedVideos] = useState([]);
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,23 +45,41 @@ const S3BucketViewer = () => {
     fetchBucketContents();
   }, []);
 
+  const handleAddVideo = () => {
+    if (selectedVideo === null) {
+      return;
+    } else if (selectedVideos.includes(selectedVideo)) {
+      return;
+    }
+
+    setSelectedVideos([
+      ...selectedVideos,
+      selectedVideo
+    ]);
+  };
+
   if (loading) return <div>Loading bucket contents...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div>
-      <h2>S3 Bucket Contents</h2>
-      <ul>
-        {files.map((file) => (
-          <li key={file.name}>
-            <div>
-              <strong>{file.name}</strong>
-              <div>Last Modified: {new Date(file.lastModified).toLocaleString()}</div>
-              <div>Size: {(file.size / 1024 / 1024).toFixed(2)} MB</div>
-            </div>
-          </li>
+    <div className="flex flex-col">
+      <div className="flex flex-row">
+        {selectedVideos.map((video) => (
+          <div className="badge badge-accent">{video}</div>
         ))}
-      </ul>
+      </div>
+      <div className="flex flex-row">
+        <select 
+          className="select select-bordered w-full max-w-xs"
+          onChange={(e) => setSelectedVideo(e.target.value)}
+        >
+          <option disabled selected>Select videos to include in analysis.</option>
+          {files.map((file) => (
+            <option key={file.name}>{file.name}</option>
+          ))}
+        </select>
+        <button className="btn btn-neutral" onClick={handleAddVideo}>Add Video</button>
+      </div>
     </div>
   );
 };
